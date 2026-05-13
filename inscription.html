@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Inscription • Info-Gram</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="box">
+        <h1 class="logo">Info-Gram</h1>
+        <p class="txt-center">Créez votre compte étudiant</p>
+
+        <div class="profile-header" style="margin-bottom: 15px;">
+            <img id="preview-photo" src="https://ui-avatars.com/api/?name=?&background=0F0CCC&color=fff&size=100" alt="Aperçu" class="profile-img">
+        </div>
+
+        <form id="form-inscription">
+            <div class="info-item">
+                <label class="txt-classique">NOM</label>
+                <input type="text" id="reg-nom" placeholder="Votre nom" required>
+            </div>
+            <div class="info-item">
+                <label class="txt-classique">PRÉNOM</label>
+                <input type="text" id="reg-prenom" placeholder="Votre prénom" required>
+            </div>
+            <div class="info-item">
+                <label class="txt-classique">E-MAIL</label>
+                <input type="email" id="reg-email" placeholder="votre@email.com" required>
+            </div>
+            <div class="info-item">
+                <label class="txt-classique">MOT DE PASSE</label>
+                <input type="password" id="reg-password" placeholder="Mot de passe" required>
+            </div>
+            <div class="info-item">
+                <label class="txt-classique">CONFIRMATION DU MOT DE PASSE</label>
+                <input type="password" id="reg-confirm" placeholder="Confirmer le mot de passe" required>
+            </div>
+            <div class="info-item">
+                <label class="txt-classique">PHOTO DE PROFIL</label>
+                <label for="reg-photo" class="btn-retour" style="cursor:pointer; text-align:center;">Choisir une image</label>
+                <input type="file" id="reg-photo" accept="image/*" style="display:none;">
+            </div>
+
+            <div id="msg-inscription" class="msg-zone" style="display:none;"></div>
+
+            <button type="submit" class="bouton" style="margin-top: 10px;">Créer le compte</button>
+        </form>
+
+        <a href="index.html" class="btn-retour">Retour à l'accueil</a>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>

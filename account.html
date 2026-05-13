@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Mon Compte • Info-Gram</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="feed-body" style="padding-bottom: 40px;">
+    <nav class="navbar">
+        <div class="nav-content">
+            <div class="nav-left">
+                <a href="feed.html" class="btn-publier" style="text-decoration: none;">← Fil</a>
+            </div>
+            <h1 class="logo-center">Info-Gram</h1>
+            <div class="nav-right">
+                <a href="messages.html" class="msg-dot-btn" title="Messages">💬</a>
+                <a href="account.html" class="nav-profile-link">
+                    <img id="nav-user-photo" src="https://via.placeholder.com/150" alt="Profil" class="nav-user-img">
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <main style="display: flex; flex-direction: column; align-items: center; width: 100%; padding: 20px;">
+
+        <!-- Profil principal (section 4.4) -->
+        <div class="box" style="margin-top: 0;">
+            <div class="profile-header">
+                <img id="display-photo" src="https://via.placeholder.com/150" alt="Photo de profil" class="profile-img">
+                <h2 id="display-fullname" style="margin-top: 10px;">Nom Prénom</h2>
+                <p id="display-bio" style="font-size: 13px; color: #8e8e8e; margin-top: 4px;">Aucune biographie.</p>
+            </div>
+
+            <div class="info-item" style="text-align:left;">
+                <label class="txt-classique">E-MAIL</label>
+                <div id="display-email">—</div>
+            </div>
+
+            <!-- Dashboard statistiques (section 6) -->
+            <div class="dashboard-stats">
+                <div class="stat-item">
+                    <span class="stat-number" id="stat-posts">0</span>
+                    <span class="stat-label">Publications</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number" id="stat-likes">0</span>
+                    <span class="stat-label">Likes reçus</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number" id="stat-comments">0</span>
+                    <span class="stat-label">Commentaires</span>
+                </div>
+            </div>
+
+            <a href="feed.html" class="bouton" style="margin-top: 15px; text-decoration: none; display: block; text-align: center;">Aller au fil d'actualité</a>
+            <a href="modi_account.html" class="btn-retour">Modifier le profil</a>
+            <button id="btn-logout" class="bouton" style="background-color: #ed4956;">Déconnexion</button>
+        </div>
+
+        <!-- Mes publications -->
+        <div class="box" style="margin-top: 20px; width: 100%; max-width: 350px;">
+            <label class="txt-classique" style="text-align: left; display: block; margin-bottom: 10px;">MES PUBLICATIONS</label>
+            <div id="display-posts">
+                <p style="color:#8e8e8e; font-size:13px;">Chargement...</p>
+            </div>
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>

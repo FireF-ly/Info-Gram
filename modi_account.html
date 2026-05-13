@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Modifier le compte • Info-Gram</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="box" style="max-width:420px;">
+        <h1 class="logo">Info-Gram</h1>
+        <p class="txt-center">Modifier les informations du compte</p>
+
+        <div class="profile-header" style="margin-bottom: 15px;">
+            <img id="edit-img-preview" src="https://via.placeholder.com/150" alt="Aperçu du profil" class="profile-img">
+            <label for="edit-photo-file" class="btn-retour" style="margin-top: 10px; cursor: pointer; text-align:center;">
+                Choisir une nouvelle photo
+            </label>
+            <input type="file" id="edit-photo-file" accept="image/*" style="display: none;">
+        </div>
+
+        <form id="form-edit">
+            <div class="info-item">
+                <label class="txt-classique">NOM</label>
+                <input type="text" id="edit-nom" required>
+            </div>
+            <div class="info-item">
+                <label class="txt-classique">PRÉNOM</label>
+                <input type="text" id="edit-prenom" required>
+            </div>
+            <div class="info-item">
+                <label class="txt-classique">E-MAIL</label>
+                <input type="email" id="edit-email" required>
+            </div>
+            <div class="info-item">
+                <label class="txt-classique">BIOGRAPHIE</label>
+                <input type="text" id="edit-bio" placeholder="Ajoutez une bio...">
+            </div>
+            <div class="info-item">
+                <label class="txt-classique">ANCIEN MOT DE PASSE (laisser vide pour ne pas changer)</label>
+                <input type="password" id="edit-old-password" placeholder="Ancien mot de passe">
+            </div>
+            <div class="info-item">
+                <label class="txt-classique">NOUVEAU MOT DE PASSE</label>
+                <input type="password" id="edit-new-password" placeholder="Nouveau mot de passe">
+            </div>
+            <div class="info-item">
+                <label class="txt-classique">CONFIRMATION DU NOUVEAU MOT DE PASSE</label>
+                <input type="password" id="edit-confirm-password" placeholder="Confirmer le nouveau mot de passe">
+            </div>
+
+            <div id="msg-edit" class="msg-zone" style="display:none;"></div>
+
+            <div style="display:flex; gap:8px; margin-top:15px;">
+                <button type="submit" class="bouton" style="margin:0; flex:1;">Enregistrer</button>
+                <a href="account.html" class="btn-retour" style="margin:0; flex:1; text-align:center; line-height:2.2;">Annuler</a>
+            </div>
+        </form>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>

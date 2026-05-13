@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Fil d'actualité • Info-Gram</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="feed-body">
+    <nav class="navbar">
+        <div class="nav-content">
+            <div class="nav-left">
+                <button id="open-modal" class="btn-publier">+ Publier</button>
+            </div>
+            <h1 class="logo-center">Info-Gram</h1>
+            <div class="nav-right">
+                <span id="nav-username" style="font-size:13px; font-weight:600; color:#262626;"></span>
+                <a href="messages.html" class="msg-dot-btn" title="Messages">💬</a>
+                <a href="account.html" class="nav-profile-link">
+                    <img id="nav-user-photo" src="https://via.placeholder.com/150" alt="Profil" class="nav-user-img">
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="feed-container">
+
+        <!-- Zone de recherche (section 4.7) -->
+        <div class="search-bar">
+            <input type="text" id="search-text" placeholder="Rechercher une publication..." oninput="filterPosts()">
+            <input type="text" id="search-author" placeholder="Filtrer par auteur..." oninput="filterPosts()">
+            <span id="search-count" class="search-count"></span>
+        </div>
+
+        <div id="feed-posts"></div>
+    </main>
+
+    <!-- Modal de publication (section 4.5 / 4.6) -->
+    <div id="post-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h2 class="txt-center">Nouvelle publication</h2>
+            <p id="post-author-display" class="post-current-user"></p>
+
+            <textarea id="post-text" placeholder="Écrivez un message..." required style="width:100%; border:1px solid #dbdbdb; border-radius:4px; padding:10px; resize:none; min-height:80px; font-family:inherit;"></textarea>
+
+            <div style="margin: 10px 0; text-align: left;">
+                <label class="txt-classique" style="margin-bottom:5px;">AJOUTER UNE IMAGE</label>
+                <label for="post-image" class="btn-retour" style="cursor:pointer; text-align:center; margin-top:5px;">Choisir une image</label>
+                <input type="file" id="post-image" accept="image/*" style="display:none;">
+                <img id="post-img-preview" src="" alt="" style="display:none; width:100%; border-radius:4px; margin-top:8px; max-height:200px; object-fit:cover;">
+            </div>
+
+            <div id="msg-post" class="msg-zone" style="display:none;"></div>
+
+            <div style="display:flex; gap:8px; margin-top:10px;">
+                <button id="btn-submit-post" class="bouton" style="margin:0; flex:1;">Publier</button>
+                <button id="btn-cancel-post" class="btn-retour" style="margin:0; flex:1;">Annuler</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

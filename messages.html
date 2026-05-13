@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Messages • Info-Gram</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="messages-page">
+
+    <nav class="navbar">
+        <div class="nav-content">
+            <div class="nav-left">
+                <a href="feed.html" class="btn-publier" style="text-decoration: none;">← Fil d'actualité</a>
+            </div>
+            <h1 class="logo-center">Info-Gram</h1>
+            <div class="nav-right">
+                <a href="account.html" class="nav-profile-link">
+                    <img id="nav-user-photo" src="https://via.placeholder.com/150" alt="Profil" class="nav-user-img">
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="messages-layout">
+        <aside class="conversations-sidebar">
+            <div class="sidebar-header">
+                <h2 style="font-size: 16px;">Messages</h2>
+                <button id="btn-new-conv" class="btn-comment" style="border-radius: 50%; width: 32px; height: 32px; padding: 0; font-size: 18px;">+</button>
+            </div>
+            <div class="conv-list" id="conv-list"></div>
+        </aside>
+
+        <main class="chat-zone" id="chat-zone">
+            <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; color: #8e8e8e; text-align: center; padding: 20px;">
+                <div style="font-size: 50px; margin-bottom: 10px;">💬</div>
+                <p>Vos messages</p>
+                <span style="font-size: 12px;">Envoyez des messages privés à un autre utilisateur.</span>
+            </div>
+        </main>
+    </div>
+
+    <div id="new-conv-modal" class="new-conv-modal">
+        <div class="new-conv-content">
+            <div style="padding: 15px; border-bottom: 1px solid #dbdbdb; display: flex; justify-content: space-between; align-items: center;">
+                <h3 style="font-size: 16px; font-weight: 600;">Nouveau message</h3>
+                <span id="close-new-conv" style="cursor: pointer; font-size: 24px; color: #262626;">&times;</span>
+            </div>
+            <div style="padding: 10px;">
+                <input type="text" id="user-search-input" placeholder="Rechercher un utilisateur..." style="width: 100%; padding: 10px; border: 1px solid #dbdbdb; border-radius: 8px; outline: none;">
+            </div>
+            <div id="new-conv-userlist" style="max-height: 300px; overflow-y: auto; padding-bottom: 10px;"></div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
