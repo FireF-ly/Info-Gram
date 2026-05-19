@@ -1,6 +1,6 @@
 # Info-Gram 📸
 
-> Mini réseau social étudiant — Projet IHM
+> Mini réseau social étudiant — 
 
 ---
 
