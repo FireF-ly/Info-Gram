@@ -1,1 +1,33 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Connexion • Info-Gram</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="box">
+        <h1 class="logo">Info-Gram</h1>
+        <p class="txt-center">Connectez-vous à votre compte</p>
 
+        <form id="form-connexion">
+            <div class="info-item">
+                <label class="txt-classique">E-MAIL</label>
+                <input type="email" id="login-email" placeholder="votre@email.com" required>
+            </div>
+            <div class="info-item">
+                <label class="txt-classique">MOT DE PASSE</label>
+                <input type="password" id="login-password" placeholder="Mot de passe" required>
+            </div>
+
+            <div id="msg-connexion" class="msg-zone" style="display:none;"></div>
+
+            <button type="submit" class="bouton" style="margin-top: 10px;">Se connecter</button>
+        </form>
+
+        <a href="index.html" class="btn-retour">Retour à l'accueil</a>
+        <a href="inscription.html" class="txt-center">Vous n'avez pas de compte ? Créez-en un !</a>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
