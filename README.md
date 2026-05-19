@@ -1,12 +1,12 @@
-# Info-Gram 📸
+# Info-Gram 
 
-> Mini réseau social étudiant — 
+> Mini réseau social étudiant
 
 ---
 
 ## Présentation
 
-Info-Gram est une application web interactive inspirée d'un réseau social simplifié, développée dans le cadre du projet IHM. Elle permet à des utilisateurs de créer un compte, publier des messages, interagir avec d'autres utilisateurs et conserver leurs données dans le navigateur.
+Info-Gram est une application web interactive inspirée d'un réseau social simplifié. Elle permet à des utilisateurs de créer un compte, publier des messages, interagir avec d'autres utilisateurs et conserver leurs données dans le navigateur.
 
 ---
 
@@ -19,25 +19,24 @@ Info-Gram est une application web interactive inspirée d'un réseau social simp
 
 ### Profil utilisateur
 - Affichage des informations personnelles
-- Tableau de bord : nombre de publications, likes reçus, commentaires
+- Tableau de bord : nombre de publications, likes reçus, commentaires reçus
 - Modification du profil (photo, nom, prénom, e-mail, biographie, mot de passe)
 
 ### Fil d'actualité
-- Publication de messages texte avec image optionnelle
-- Affichage en temps réel sans rechargement de page
+- Publication de messages texte avec ou sans image
+- Affichage en temps réel
 - Date et heure sur chaque publication
-- Système de likes
-- Commentaires sur les publications
-- Suppression de ses propres publications
+- Possibilité de liker les publications 
+- Possibilité de commenter sous les publications
+- Possibilité de supprimer ses propres publications 
 
 ### Recherche
-- Recherche en temps réel par contenu
+- Recherche en temps réel
+- Filtre par contenu
 - Filtre par auteur
-- Message "Aucun résultat" si aucune publication ne correspond
 
 ### Messagerie privée
 - Conversations privées entre utilisateurs
-- Création d'une nouvelle conversation
 - Envoi et réception de messages
 
 ---
