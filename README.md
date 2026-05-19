@@ -87,7 +87,7 @@ info-gram/
 Aucune installation requise. Il suffit d'ouvrir `index.html` dans un navigateur moderne (Chrome, Firefox, Edge).
 
 ```bash
-# Cloner le repo
+# Cloner le repos
 git clone https://github.com/VOTRE_USERNAME/info-gram.git
 
 # Ouvrir dans le navigateur
