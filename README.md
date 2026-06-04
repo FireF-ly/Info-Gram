@@ -1,6 +1,6 @@
 # Info-Gram 
 
-> Mini réseau social étudiant
+> Mini réseau social 
 
 ---
 
