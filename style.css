@@ -168,16 +168,6 @@ textarea:focus {
     background-color: #dbdbdb;
 }
 
-.btn2-retour { 
-   color: #0F0CCC; 
-   font-weight: 600; 
-   text-decoration: none; 
-}
-
-.btn2-retour:hover { 
-   ext-decoration: underline; 
-}
-
 .btn-publier {
     background-color: #0F0CCC;
     color: white;
