@@ -1,9 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
     const pageTitle = document.title;
 
-    // ============================================================
-    // FONCTIONS UTILITAIRES — STOCKAGE (localStorage + JSON)
-    // ============================================================
+ //////////////////////////// FONCTIONS LOCAL STORAGE ////////////////////////////
 
     const getAllUsers = () => {
         const data = localStorage.getItem('ig_users');
@@ -19,7 +17,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const savePosts = (posts) => localStorage.setItem('ig_posts', JSON.stringify(posts));
 
-    // Session : utilisateur connecté (localStorage)
     const getCurrentUser = () => {
         const data = localStorage.getItem('ig_session');
         return data ? JSON.parse(data) : null;
@@ -29,7 +26,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const clearSession = () => localStorage.removeItem('ig_session');
 
-    // Messagerie
     const getMessages = () => {
         const m = localStorage.getItem('ig_messages');
         return m ? JSON.parse(m) : {};
@@ -38,7 +34,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const convId = (a, b) => [a, b].sort().join('__');
     const escapeHtml = (str) => str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 
-    // Formatage de la date
     const formatDate = (ts) => {
         const d = new Date(ts);
         const date = d.toLocaleDateString('fr-FR');
@@ -46,7 +41,6 @@ document.addEventListener('DOMContentLoaded', () => {
         return `${date} — ${time}`;
     };
 
-    // Affichage des messages d'erreur/succès inline
     const showMsg = (id, text, isError = true) => {
         const el = document.getElementById(id);
         if (!el) return;
@@ -60,11 +54,8 @@ document.addEventListener('DOMContentLoaded', () => {
         if (el) { el.style.display = 'none'; el.textContent = ''; }
     };
 
-    // Avatar par défaut basé sur le nom
-    const defaultAvatar = (nom, prenom) =>
-        `https://ui-avatars.com/api/?name=${encodeURIComponent((prenom || '?') + '+' + (nom || ''))}&background=0F0CCC&color=fff&size=100`;
+    const defaultAvatar = (nom, prenom) => `https://ui-avatars.com/api/?name=${encodeURIComponent((prenom || '?') + '+' + (nom || ''))}&background=0F0CCC&color=fff&size=100`;
 
-    // Mise à jour de la photo dans la navbar
     const currentUser = getCurrentUser();
     if (currentUser) {
         const navPhoto = document.getElementById('nav-user-photo');
@@ -73,19 +64,17 @@ document.addEventListener('DOMContentLoaded', () => {
         if (navName) navName.textContent = currentUser.prenom + ' ' + currentUser.nom;
     }
 
-    // Protection des pages nécessitant une connexion
     const protectedPages = ["Fil d'actualité", "Mon Compte", "Modifier le compte", "Messages"];
     if (protectedPages.some(p => pageTitle.includes(p)) && !currentUser) {
         window.location.href = 'connect.html';
         return;
     }
 
-    // ============================================================
-    // 1. INSCRIPTION
-    // ============================================================
+ //////////////////////////// GESTION DE LA PAGE INSCRIPTION ////////////////////////////
+
     if (pageTitle.includes("Inscription")) {
 
-        // Aperçu photo en temps réel
+        //Apercu de la photo 
         const photoInput = document.getElementById('reg-photo');
         if (photoInput) {
             photoInput.addEventListener('change', () => {
@@ -99,12 +88,13 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
 
+        //initialisatio des champs du formulaire de connexion 
         const form = document.getElementById('form-inscription');
         if (form) {
             form.addEventListener('submit', async (e) => {
                 e.preventDefault();
                 hideMsg('msg-inscription');
-
+        
                 const nom = document.getElementById('reg-nom').value.trim();
                 const prenom = document.getElementById('reg-prenom').value.trim();
                 const email = document.getElementById('reg-email').value.trim();
@@ -112,7 +102,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const confirm = document.getElementById('reg-confirm').value;
                 const photoFile = photoInput ? photoInput.files[0] : null;
 
-                // Validations
+                // Vérification obligatoires
                 if (!nom || !prenom || !email || !password || !confirm) {
                     showMsg('msg-inscription', 'Tous les champs sont obligatoires.');
                     return;
@@ -136,7 +126,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     return;
                 }
 
-                // Lecture photo
+                // Lecture de l'image 
                 let photoData = defaultAvatar(nom, prenom);
                 if (photoFile) {
                     photoData = await new Promise(res => {
@@ -146,6 +136,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     });
                 }
 
+                //Creation et sauvegarde d'un nouvel utilisateur 
                 const newUser = { nom, prenom, email, password, bio: '', photo: photoData };
                 users.push(newUser);
                 saveUsers(users);
@@ -156,9 +147,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // ============================================================
-    // 2. CONNEXION
-    // ============================================================
+ //////////////////////////// GESTION DE LA PAGE CONNEXION ////////////////////////////
+
     if (pageTitle.includes("Connexion")) {
         const form = document.getElementById('form-connexion');
         if (form) {
@@ -166,9 +156,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 e.preventDefault();
                 hideMsg('msg-connexion');
 
+                //Récupération des données entrées par l'utilisateur 
                 const email = document.getElementById('login-email').value.trim();
                 const password = document.getElementById('login-password').value;
 
+                //Vérification que les données rentrées sont déjà enregistrées  
                 const users = getAllUsers();
                 const found = users.find(u => u.email === email && u.password === password);
 
@@ -182,28 +174,29 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // ============================================================
-    // 3. PAGE COMPTE (Profil — section 4.4 + Dashboard — section 6)
-    // ============================================================
+ //////////////////////////// GESTION DE LA PAGE DU COMPTE ////////////////////////////
+
     if (pageTitle.includes("Mon Compte")) {
         if (!currentUser) return;
 
+        //Récupération des posts des utilisateurs
         const allPosts = getAllPosts();
         const myPosts = allPosts.filter(p => p.email === currentUser.email);
         const likesReçus = myPosts.reduce((sum, p) => sum + (p.likes ? p.likes.length : 0), 0);
         const commentsReçus = myPosts.reduce((sum, p) => sum + (p.comments ? p.comments.length : 0), 0);
 
+        
         document.getElementById('display-photo').src = currentUser.photo || defaultAvatar(currentUser.nom, currentUser.prenom);
         document.getElementById('display-fullname').textContent = currentUser.prenom + ' ' + currentUser.nom;
         document.getElementById('display-email').textContent = currentUser.email;
         if (currentUser.bio) document.getElementById('display-bio').textContent = currentUser.bio;
 
-        // Dashboard statistiques
+        //Récupérations des données statistiques du compte de l'utilisateur 
         document.getElementById('stat-posts').textContent = myPosts.length;
         document.getElementById('stat-likes').textContent = likesReçus;
         document.getElementById('stat-comments').textContent = commentsReçus;
 
-        // Mes publications
+        //Affichage des post de l'utilisateur 
         const postsContainer = document.getElementById('display-posts');
         postsContainer.innerHTML = myPosts.slice().reverse().map(p => `
             <div style="background:#fafafa; border:1px solid #dbdbdb; border-radius:4px; padding:10px; margin-bottom:8px; text-align:left;">
@@ -214,24 +207,26 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>
         `).join('') || `<p style="color:#8e8e8e; font-size:13px;">Aucune publication.</p>`;
 
+        //Initialisation du bouton de déconnexion pour une redirection vers l'acceuil
         document.getElementById('btn-logout').onclick = () => {
             clearSession();
             window.location.href = 'index.html';
         };
     }
 
-    // ============================================================
-    // 4. MODIFICATION DU COMPTE
-    // ============================================================
+ //////////////////////////// GESTION DE LA PAGE DE MODIFICATION DU COMPTE ////////////////////////////
+
     if (pageTitle.includes("Modifier le compte")) {
         if (!currentUser) return;
 
+        //Récupération des données de l'utilisateur 
         document.getElementById('edit-nom').value = currentUser.nom || '';
         document.getElementById('edit-prenom').value = currentUser.prenom || '';
         document.getElementById('edit-email').value = currentUser.email || '';
         document.getElementById('edit-bio').value = currentUser.bio || '';
         document.getElementById('edit-img-preview').src = currentUser.photo || defaultAvatar(currentUser.nom, currentUser.prenom);
 
+        //Changement de la photo utilisateur 
         const photoFileInput = document.getElementById('edit-photo-file');
         photoFileInput.addEventListener('change', () => {
             const file = photoFileInput.files[0];
@@ -243,6 +238,7 @@ document.addEventListener('DOMContentLoaded', () => {
             reader.readAsDataURL(file);
         });
 
+        //"Affichage" des données de l'utilisateur 
         document.getElementById('form-edit').addEventListener('submit', async (e) => {
             e.preventDefault();
             hideMsg('msg-edit');
@@ -261,6 +257,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
+            //vérifie que l'email modifié n'est pas déjà utilisé 
             const users = getAllUsers();
             const conflict = users.find(u => u.email === email && u.email !== currentUser.email);
             if (conflict) {
@@ -268,7 +265,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
-            // Gestion du mot de passe
+            //Gestion du mot de passe
             let newPassword = currentUser.password;
             if (oldPwd || newPwd || confirmPwd) {
                 if (oldPwd !== currentUser.password) {
@@ -307,9 +304,8 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // ============================================================
-    // 5. FIL D'ACTUALITÉ (sections 4.5, 4.6, 4.7, 4.8)
-    // ============================================================
+ //////////////////////////// GESTION DE LA PAGE DU FIL D4ACTUALITE ////////////////////////////
+
     if (pageTitle.includes("Fil d'actualité")) {
         if (!currentUser) return;
 
@@ -326,7 +322,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('post-author-display').textContent =
             'Publication en tant que ' + currentUser.prenom + ' ' + currentUser.nom;
 
-        // Aperçu image dans la modale
+        //Aperçu image dans la modale
         const postImageInput = document.getElementById('post-image');
         postImageInput.addEventListener('change', () => {
             const file = postImageInput.files[0];
@@ -343,7 +339,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        // Rendu du fil avec filtre
+        //Rendu du fil avec filtre
         const renderPosts = (filterText = '', filterAuthor = '') => {
             const feed = document.getElementById('feed-posts');
             const posts = getAllPosts();
@@ -359,7 +355,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 return matchText && matchAuthor;
             });
 
-            // Compteur de résultats
+            //Compteur de résultats
             const countEl = document.getElementById('search-count');
             if (fl || fa) {
                 countEl.textContent = filtered.length + ' publication' + (filtered.length !== 1 ? 's' : '') + ' trouvée' + (filtered.length !== 1 ? 's' : '');
@@ -436,7 +432,7 @@ document.addEventListener('DOMContentLoaded', () => {
             );
         };
 
-        // Supprimer (uniquement ses propres publications)
+        //Supprimer un post (uniquement ceux de l'utilisateur courant) 
         window.deletePost = (id) => {
             let posts = getAllPosts();
             const p = posts.find(post => post.id === id);
@@ -450,7 +446,7 @@ document.addEventListener('DOMContentLoaded', () => {
             );
         };
 
-        // Ajouter commentaire
+        //Ajouter un commentaire
         window.addComment = (id) => {
             const inputEl = document.getElementById(`comment-input-${id}`);
             const val = inputEl ? inputEl.value.trim() : '';
@@ -472,7 +468,7 @@ document.addEventListener('DOMContentLoaded', () => {
             );
         };
 
-        // Publier
+        //Publier un post 
         document.getElementById('btn-submit-post').onclick = async () => {
             hideMsg('msg-post');
             const text = document.getElementById('post-text').value.trim();
@@ -512,13 +508,13 @@ document.addEventListener('DOMContentLoaded', () => {
         renderPosts();
     }
 
-    // ============================================================
-    // 6. MESSAGERIE
-    // ============================================================
+ //////////////////////////// GESTION DE LA PAGE DE MESSAGERIE ////////////////////////////
+
     if (pageTitle.includes("Messages")) {
         if (!currentUser) return;
         let activeConv = null;
 
+        //Récupération des la liste des messages utilisateurs
         const renderConvList = () => {
             const allMsgs = getMessages();
             const users = getAllUsers();
@@ -545,6 +541,7 @@ document.addEventListener('DOMContentLoaded', () => {
             renderChat();
         };
 
+        //Affichage de la zone de message avec un utilisateur 
         const renderChat = () => {
             const zone = document.getElementById('chat-zone');
             const users = getAllUsers();
@@ -592,6 +589,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (e.target === newConvModal) newConvModal.classList.remove('open');
         });
 
+        //Affichage de la zone de nouveau message avec un utilisateur 
         const renderUserSearch = (query) => {
             const users = getAllUsers().filter(u =>
                 u.email !== currentUser.email &&
