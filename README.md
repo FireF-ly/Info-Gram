@@ -56,7 +56,7 @@ Info-Gram est une application web interactive inspirée d'un réseau social simp
 ## Structure du projet
 
 ```
-info-gram/
+Info-Gram/
 ├── index.html          # Page d'accueil
 ├── inscription.html    # Création de compte
 ├── connect.html        # Connexion
@@ -87,10 +87,10 @@ Aucune installation requise. Il suffit d'ouvrir `index.html` dans un navigateur 
 
 ```bash
 # Cloner le repos
-git clone https://github.com/VOTRE_USERNAME/info-gram.git
+git clone https://github.com/FireF-ly/Info-Gram.git
 
 # Ouvrir dans le navigateur
-cd info-gram
+cd Info-Gram
 open index.html   # macOS
 start index.html  # Windows
 ```
@@ -112,6 +112,6 @@ start index.html  # Windows
 
 ---
 
-## Auteurs
+## Auteurs Degache Maxence, Frery Mathis
 
 Projet réalisé dans le cadre du cours d'IHM.
