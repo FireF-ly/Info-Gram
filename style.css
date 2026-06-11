@@ -341,7 +341,6 @@ textarea:focus {
     font-weight: 600;
 }
 
-/* ---------- Fil de publications ---------- */
 .feed-container {
     max-width: 600px;
     margin: 0 auto;
@@ -393,7 +392,6 @@ textarea:focus {
     margin-top: 2px;
 }
 
-/* Bouton supprimer (seulement pour ses propres publications) */
 .btn-delete-post {
     margin-left: auto;
     background: none;
@@ -419,7 +417,6 @@ textarea:focus {
     color: #262626;
 }
 
-/* ---------- Image dans un post ---------- */
 .post-image-content {
     width: 100%;
     max-height: 450px;
@@ -429,7 +426,6 @@ textarea:focus {
     border-bottom: 1px solid #efefef;
 }
 
-/* ---------- Actions (likes) ---------- */
 .post-actions {
     padding: 10px 16px;
     display: flex;
@@ -463,7 +459,6 @@ textarea:focus {
     font-weight: 700;
 }
 
-/* ---------- Commentaires ---------- */
 .comments-section {
     padding: 10px 16px 14px;
     background: #fafafa;
@@ -520,7 +515,6 @@ textarea:focus {
     background-color: #0a08a0;
 }
 
-/* ---------- Aucun résultat (section 4.8) ---------- */
 .no-result {
     text-align: center;
     padding: 60px 20px;
@@ -538,7 +532,6 @@ textarea:focus {
     font-size: 13px;
 }
 
-/* ---------- Modal publication ---------- */
 .modal {
     display: none;
     position: fixed;
@@ -593,7 +586,6 @@ textarea:focus {
     margin: 8px 0 12px;
 }
 
-/* ---------- Messagerie ---------- */
 body.messages-page {
     display: flex;
     flex-direction: column;
@@ -758,7 +750,6 @@ body.messages-page {
     background: #fff;
 }
 
-/* Modal nouvelle conversation */
 .new-conv-modal {
     display: none;
     position: fixed;
@@ -796,7 +787,6 @@ body.messages-page {
     object-fit: cover;
 }
 
-/* ---------- Bouton messagerie dans la navbar ---------- */
 .msg-dot-btn {
     width: 35px;
     height: 35px;
@@ -817,7 +807,6 @@ body.messages-page {
     background: #e8eaf6;
 }
 
-/* ---------- Responsive ---------- */
 @media (max-width: 600px) {
     .conversations-sidebar {
         width: 100%;
