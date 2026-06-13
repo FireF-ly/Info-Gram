@@ -37,6 +37,16 @@ document.addEventListener('DOMContentLoaded', () => {
         localStorage.setItem(`minibook_follows_${userEmail}`, JSON.stringify(followsList));
     }
 
+    // Gestion des conversations privées
+    function getAllConversations() {
+        const data = localStorage.getItem('minibook_conversations');
+        return data ? JSON.parse(data) : [];
+    }
+
+    function saveConversations(convs) {
+        localStorage.setItem('minibook_conversations', JSON.stringify(convs));
+    }
+
     const cleanHTML = (str) => str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 
     // Formatage de la date pour l'affichage des posts
@@ -60,15 +70,22 @@ document.addEventListener('DOMContentLoaded', () => {
     const currentUser = getCurrentSession();
 
     // Remplissage des infos de la barre de navigation si connecté
+    // Note : nav-username n'est pas présent dans les HTML, on le gère prudemment
     if (currentUser) {
         const navPhoto = document.getElementById('nav-user-photo');
         if (navPhoto) navPhoto.src = currentUser.photo || getDefaultAvatar(currentUser.nom, currentUser.prenom);
-        
+
         const navName = document.getElementById('nav-username');
         if (navName) navName.textContent = `${currentUser.prenom} ${currentUser.nom}`;
     }
 
-    const requiresAuth = document.getElementById('feed-posts') || document.getElementById('profile-container') || document.getElementById('form-edit');
+    // Pages protégées : feed-posts (feed.html), profile-container (account.html), form-edit (modi_account.html)
+    // account.html n'a pas d'id="profile-container" → on utilise display-photo comme détecteur
+    const requiresAuth = document.getElementById('feed-posts')
+        || document.getElementById('display-photo')
+        || document.getElementById('form-edit')
+        || document.getElementById('conv-list');
+
     if (requiresAuth && !currentUser) {
         window.location.href = 'connect.html';
         return;
@@ -83,13 +100,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const formInscription = document.getElementById('form-inscription');
     if (formInscription) {
         const photoInput = document.getElementById('reg-photo');
-        
+
         // Gérer l'aperçu dynamique de la photo de profil
         if (photoInput) {
             photoInput.addEventListener('change', function() {
                 const file = this.files[0];
                 if (!file) return;
-                
+
                 const reader = new FileReader();
                 reader.onload = (e) => {
                     document.getElementById('preview-photo').src = e.target.result;
@@ -170,11 +187,12 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // --- PAGE COMPTE & DASHBOARD (STATISTIQUES) ---
-    const profileContainer = document.getElementById('profile-container');
-    if (profileContainer && currentUser) {
+    // Détecté via display-photo (account.html)
+    const displayPhoto = document.getElementById('display-photo');
+    if (displayPhoto && currentUser) {
         const allPosts = getAllPosts();
         const myPosts = allPosts.filter(p => p.email === currentUser.email);
-        
+
         // Calcul des métriques demandées pour le Dashboard
         const totalLikes = myPosts.reduce((sum, p) => sum + (p.likes ? p.likes.length : 0), 0);
         const totalComments = myPosts.reduce((sum, p) => sum + (p.comments ? p.comments.length : 0), 0);
@@ -183,7 +201,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('display-photo').src = currentUser.photo;
         document.getElementById('display-fullname').textContent = `${currentUser.prenom} ${currentUser.nom}`;
         document.getElementById('display-email').textContent = currentUser.email;
-        
+
         const bioEl = document.getElementById('display-bio');
         if (bioEl) bioEl.textContent = currentUser.bio || "Pas encore de biographie.";
 
@@ -206,13 +224,16 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         // Action du bouton de Déconnexion
-        document.getElementById('btn-logout').onclick = () => {
-            localStorage.removeItem('minibook_session');
-            window.location.href = 'index.html';
-        };
+        const btnLogout = document.getElementById('btn-logout');
+        if (btnLogout) {
+            btnLogout.onclick = () => {
+                localStorage.removeItem('minibook_session');
+                window.location.href = 'index.html';
+            };
+        }
     }
 
-    // --- PAGE EDITEUR DE PROFIL ---
+    // --- PAGE EDITEUR DE PROFIL (modi_account.html) ---
     const formEdit = document.getElementById('form-edit');
     if (formEdit && currentUser) {
         // Pré-remplissage automatique des inputs
@@ -242,6 +263,9 @@ document.addEventListener('DOMContentLoaded', () => {
             const oldPwd = document.getElementById('edit-old-password').value;
             const newPwd = document.getElementById('edit-new-password').value;
             const confirmPwd = document.getElementById('edit-confirm-password').value;
+
+            // Affichage des erreurs via msg-edit (présent dans modi_account.html)
+            const msgEdit = document.getElementById('msg-edit');
 
             if (!nom || !prenom || !email) {
                 alert('Nom, prénom et e-mail requis.');
@@ -286,12 +310,18 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // --- PAGE PRINCIPALE : FIL D'ACTUALITÉ & RECHERCHE ---
+    // --- PAGE PRINCIPALE : FIL D'ACTUALITÉ & RECHERCHE (feed.html) ---
     const feedPostsContainer = document.getElementById('feed-posts');
     if (feedPostsContainer && currentUser) {
 
         const modal = document.getElementById('post-modal');
         const openModalBtn = document.getElementById('open-modal');
+
+        // Affichage du nom de l'utilisateur connecté dans la modale
+        const postAuthorDisplay = document.getElementById('post-author-display');
+        if (postAuthorDisplay) {
+            postAuthorDisplay.textContent = `${currentUser.prenom} ${currentUser.nom}`;
+        }
 
         if (openModalBtn && modal) {
             openModalBtn.onclick = () => {
@@ -343,7 +373,7 @@ document.addEventListener('DOMContentLoaded', () => {
             filteredPosts.sort((a, b) => {
                 const aIsFollowed = currentFollows.includes(a.email) ? 1 : 0;
                 const bIsFollowed = currentFollows.includes(b.email) ? 1 : 0;
-                
+
                 if (aIsFollowed !== bIsFollowed) {
                     return bIsFollowed - aIsFollowed; // Les comptes suivis montent en haut
                 }
@@ -361,7 +391,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
 
-            // Gestion de l'écran "Aucun résultat" (Exigence 4.8 du sujet)
+            // Gestion de l'écran "Aucun résultat"
             if (filteredPosts.length === 0) {
                 feedPostsContainer.innerHTML = `
                     <div class="search-no-result">
@@ -422,9 +452,14 @@ document.addEventListener('DOMContentLoaded', () => {
             }).join('');
         }
 
-        // Ecouteurs d'événements pour la recherche temps réel en cours de frappe
+        // Ecouteurs d'événements pour la recherche en temps réel
+        // Note : les inputs en HTML appellent filterPosts() via oninput,
+        // on expose donc filterPosts globalement en plus des event listeners
         document.getElementById('search-text')?.addEventListener('input', updateFeedDisplay);
         document.getElementById('search-author')?.addEventListener('input', updateFeedDisplay);
+
+        // Alias global pour la compatibilité avec les attributs oninput du HTML (feed.html)
+        window.filterPosts = updateFeedDisplay;
 
         window.triggerLikePost = function(id) {
             const posts = getAllPosts();
@@ -520,5 +555,181 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Lancement initial du fil d'actualité au chargement du script
         updateFeedDisplay();
+    }
+
+
+    // ==========================================
+    // 5. PAGE MESSAGES (messages.html)
+    // ==========================================
+
+    const convList = document.getElementById('conv-list');
+    if (convList && currentUser) {
+
+        let activeConvId = null;
+
+        // --- Rendu de la liste des conversations dans la sidebar ---
+        function renderConvList() {
+            const convs = getAllConversations().filter(c => c.participants.includes(currentUser.email));
+            const users = getAllUsers();
+
+            if (convs.length === 0) {
+                convList.innerHTML = `<p style="padding: 15px; font-size: 13px; color: #8e8e8e;">Aucune conversation.</p>`;
+                return;
+            }
+
+            convList.innerHTML = convs.map(c => {
+                const otherEmail = c.participants.find(e => e !== currentUser.email);
+                const otherUser = users.find(u => u.email === otherEmail);
+                const otherName = otherUser ? `${otherUser.prenom} ${otherUser.nom}` : otherEmail;
+                const otherPhoto = otherUser?.photo || getDefaultAvatar(otherUser?.nom || '?', otherUser?.prenom || '?');
+                const lastMsg = c.messages[c.messages.length - 1];
+                const isActive = c.id === activeConvId ? 'conv-item-active' : '';
+
+                return `
+                    <div class="conv-item ${isActive}" onclick="openConversation('${c.id}')">
+                        <img src="${otherPhoto}" class="conv-avatar" alt="">
+                        <div class="conv-info">
+                            <span class="conv-name">${otherName}</span>
+                            <span class="conv-last-msg">${lastMsg ? cleanHTML(lastMsg.text).substring(0, 30) + (lastMsg.text.length > 30 ? '…' : '') : 'Nouvelle conversation'}</span>
+                        </div>
+                    </div>`;
+            }).join('');
+        }
+
+        // --- Affichage d'une conversation dans la zone de chat ---
+        function renderChatZone(convId) {
+            const chatZone = document.getElementById('chat-zone');
+            const convs = getAllConversations();
+            const conv = convs.find(c => c.id === convId);
+            if (!conv || !chatZone) return;
+
+            const users = getAllUsers();
+            const otherEmail = conv.participants.find(e => e !== currentUser.email);
+            const otherUser = users.find(u => u.email === otherEmail);
+            const otherName = otherUser ? `${otherUser.prenom} ${otherUser.nom}` : otherEmail;
+            const otherPhoto = otherUser?.photo || getDefaultAvatar(otherUser?.nom || '?', otherUser?.prenom || '?');
+
+            chatZone.innerHTML = `
+                <div class="chat-header">
+                    <img src="${otherPhoto}" class="conv-avatar" alt="">
+                    <span style="font-weight: 600; font-size: 15px;">${otherName}</span>
+                </div>
+                <div class="chat-messages" id="chat-messages">
+                    ${conv.messages.map(m => {
+                        const isMine = m.from === currentUser.email;
+                        return `
+                            <div class="msg-bubble-wrap ${isMine ? 'msg-mine' : 'msg-theirs'}">
+                                <div class="msg-bubble">${cleanHTML(m.text)}</div>
+                                <span class="msg-time">${formatDate(m.ts)}</span>
+                            </div>`;
+                    }).join('')}
+                </div>
+                <div class="chat-input-bar">
+                    <input type="text" id="msg-input-field" placeholder="Envoyer un message..." style="flex:1; padding:10px; border:1px solid #dbdbdb; border-radius:20px; outline:none;">
+                    <button onclick="sendMessage('${convId}')" class="btn-comment" style="border-radius:20px; padding: 8px 16px;">Envoyer</button>
+                </div>`;
+
+            // Scroll automatique vers le bas
+            const msgContainer = document.getElementById('chat-messages');
+            if (msgContainer) msgContainer.scrollTop = msgContainer.scrollHeight;
+
+            // Envoi via touche Entrée
+            const input = document.getElementById('msg-input-field');
+            if (input) {
+                input.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter') sendMessage(convId);
+                });
+            }
+        }
+
+        window.openConversation = function(convId) {
+            activeConvId = convId;
+            renderConvList();
+            renderChatZone(convId);
+        };
+
+        window.sendMessage = function(convId) {
+            const input = document.getElementById('msg-input-field');
+            const text = input ? input.value.trim() : '';
+            if (!text) return;
+
+            const convs = getAllConversations();
+            const conv = convs.find(c => c.id === convId);
+            if (!conv) return;
+
+            conv.messages.push({ from: currentUser.email, text, ts: Date.now() });
+            saveConversations(convs);
+            renderConvList();
+            renderChatZone(convId);
+        };
+
+        // --- Modal "Nouveau message" : recherche d'utilisateurs ---
+        const btnNewConv = document.getElementById('btn-new-conv');
+        const newConvModal = document.getElementById('new-conv-modal');
+        const closeNewConv = document.getElementById('close-new-conv');
+        const userSearchInput = document.getElementById('user-search-input');
+        const newConvUserlist = document.getElementById('new-conv-userlist');
+
+        function renderUserSearchResults(query) {
+            const users = getAllUsers().filter(u =>
+                u.email !== currentUser.email &&
+                (`${u.prenom} ${u.nom}`.toLowerCase().includes(query.toLowerCase()) || u.email.toLowerCase().includes(query.toLowerCase()))
+            );
+
+            if (users.length === 0) {
+                newConvUserlist.innerHTML = `<p style="padding:15px; font-size:13px; color:#8e8e8e;">Aucun utilisateur trouvé.</p>`;
+                return;
+            }
+
+            newConvUserlist.innerHTML = users.map(u => `
+                <div class="conv-item" onclick="startConversationWith('${u.email}')" style="cursor:pointer;">
+                    <img src="${u.photo || getDefaultAvatar(u.nom, u.prenom)}" class="conv-avatar" alt="">
+                    <div class="conv-info">
+                        <span class="conv-name">${u.prenom} ${u.nom}</span>
+                        <span class="conv-last-msg">${u.email}</span>
+                    </div>
+                </div>`).join('');
+        }
+
+        if (btnNewConv && newConvModal) {
+            btnNewConv.onclick = () => {
+                newConvModal.style.display = 'flex';
+                if (userSearchInput) {
+                    userSearchInput.value = '';
+                    renderUserSearchResults('');
+                }
+            };
+        }
+        if (closeNewConv && newConvModal) {
+            closeNewConv.onclick = () => newConvModal.style.display = 'none';
+        }
+        if (userSearchInput) {
+            userSearchInput.addEventListener('input', () => renderUserSearchResults(userSearchInput.value));
+        }
+
+        window.startConversationWith = function(targetEmail) {
+            let convs = getAllConversations();
+
+            // Vérifier si une conv existe déjà entre les deux utilisateurs
+            let existing = convs.find(c =>
+                c.participants.includes(currentUser.email) && c.participants.includes(targetEmail)
+            );
+
+            if (!existing) {
+                existing = {
+                    id: `conv_${Date.now()}`,
+                    participants: [currentUser.email, targetEmail],
+                    messages: []
+                };
+                convs.push(existing);
+                saveConversations(convs);
+            }
+
+            if (newConvModal) newConvModal.style.display = 'none';
+            openConversation(existing.id);
+        };
+
+        // Initialisation de la page messages
+        renderConvList();
     }
 });
