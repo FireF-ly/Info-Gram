@@ -70,7 +70,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const currentUser = getCurrentSession();
 
     // Remplissage des infos de la barre de navigation si connecté
-    // Note : nav-username n'est pas présent dans les HTML, on le gère prudemment
     if (currentUser) {
         const navPhoto = document.getElementById('nav-user-photo');
         if (navPhoto) navPhoto.src = currentUser.photo || getDefaultAvatar(currentUser.nom, currentUser.prenom);
@@ -79,8 +78,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (navName) navName.textContent = `${currentUser.prenom} ${currentUser.nom}`;
     }
 
-    // Pages protégées : feed-posts (feed.html), profile-container (account.html), form-edit (modi_account.html)
-    // account.html n'a pas d'id="profile-container" → on utilise display-photo comme détecteur
+    // Pages protégées : feed.html, account.html, modi_account.html, messages.html
     const requiresAuth = document.getElementById('feed-posts')
         || document.getElementById('display-photo')
         || document.getElementById('form-edit')
@@ -210,17 +208,21 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('stat-likes').textContent = totalLikes;
         document.getElementById('stat-comments').textContent = totalComments;
 
-        // Historique personnel des publications de l'utilisateur
+        // Historique personnel des publications — classes alignées sur le CSS
         const postsContainer = document.getElementById('display-posts');
         if (postsContainer) {
             postsContainer.innerHTML = myPosts.slice().reverse().map(p => `
-                <div class="user-archive-card">
-                    <span class="archive-date">${formatDate(p.id)}</span>
-                    <p class="archive-text">${cleanHTML(p.text)}</p>
-                    ${p.image ? `<img src="${p.image}" class="archive-image">` : ''}
-                    <span class="archive-meta">❤️ ${p.likes ? p.likes.length : 0} J'aime</span>
+                <div class="post-card" style="margin-bottom:12px;">
+                    <div class="post-content">
+                        <span class="post-date">${formatDate(p.id)}</span>
+                        <p style="margin-top:6px;">${cleanHTML(p.text)}</p>
+                    </div>
+                    ${p.image ? `<img src="${p.image}" class="post-image-content" alt="">` : ''}
+                    <div class="post-actions">
+                        <span class="btn-like">❤️ ${p.likes ? p.likes.length : 0} J'aime</span>
+                    </div>
                 </div>
-            `).join('') || `<p class="no-data-text">Aucune publication pour le moment.</p>`;
+            `).join('') || `<p style="color:#8e8e8e; font-size:13px;">Aucune publication pour le moment.</p>`;
         }
 
         // Action du bouton de Déconnexion
@@ -264,7 +266,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const newPwd = document.getElementById('edit-new-password').value;
             const confirmPwd = document.getElementById('edit-confirm-password').value;
 
-            // Affichage des erreurs via msg-edit (présent dans modi_account.html)
             const msgEdit = document.getElementById('msg-edit');
 
             if (!nom || !prenom || !email) {
@@ -391,17 +392,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
 
-            // Gestion de l'écran "Aucun résultat"
+            // Gestion de l'écran "Aucun résultat" — classes CSS : .no-result
             if (filteredPosts.length === 0) {
                 feedPostsContainer.innerHTML = `
-                    <div class="search-no-result">
-                        <p class="title-no-result">Aucun résultat trouvé</p>
+                    <div class="no-result">
+                        <p>Aucun résultat trouvé</p>
                         <span>Veuillez modifier vos critères de recherche ou l'orthographe du nom de l'auteur.</span>
                     </div>`;
                 return;
             }
 
-            // Injection propre du code HTML sans aucun style en ligne
+            // Injection HTML — toutes les classes correspondent au CSS
             feedPostsContainer.innerHTML = filteredPosts.map(p => {
                 const authorObj = users.find(u => u.email === p.email);
                 const avatarUrl = authorObj?.photo || getDefaultAvatar(p.nomAuteur, p.prenomAuteur);
@@ -410,10 +411,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 const userIsFollowing = currentFollows.includes(p.email);
 
                 // Génération conditionnelle du bouton Follow/Unfollow
+                // .btn-retour utilisé car correspond au style gris secondaire du CSS
                 let followBtnHtml = '';
                 if (!isOwner) {
                     followBtnHtml = `
-                        <button class="btn-follow-toggle ${userIsFollowing ? 'is-following' : ''}" onclick="toggleFollowUser('${p.email}')">
+                        <button class="btn-retour ${userIsFollowing ? 'is-following' : ''}"
+                            style="width:auto; margin:0; padding:6px 12px; font-size:12px;"
+                            onclick="toggleFollowUser('${p.email}')">
                             ${userIsFollowing ? 'Ne plus suivre' : 'Suivre'}
                         </button>
                     `;
@@ -422,43 +426,40 @@ document.addEventListener('DOMContentLoaded', () => {
                 return `
                 <div class="post-card">
                     <div class="post-header">
-                        <img src="${avatarUrl}" class="post-author-avatar" alt="">
-                        <div class="post-author-info">
-                            <span class="post-author-name">${p.prenomAuteur} ${p.nomAuteur}</span>
-                            <span class="post-timestamp">${formatDate(p.id)}</span>
+                        <img src="${avatarUrl}" class="post-user-img" alt="">
+                        <div>
+                            <span class="post-username">${p.prenomAuteur} ${p.nomAuteur}</span>
+                            <span class="post-date">${formatDate(p.id)}</span>
                         </div>
                         ${followBtnHtml}
                         ${isOwner ? `<button class="btn-delete-post" onclick="triggerDeletePost(${p.id})">🗑 Supprimer</button>` : ''}
                     </div>
-                    <div class="post-content-body">
+                    <div class="post-content">
                         <p>${cleanHTML(p.text)}</p>
-                        ${p.image ? `<img src="${p.image}" class="post-attached-media" alt="">` : ''}
                     </div>
-                    <div class="post-interactive-actions">
-                        <button class="btn-like-action ${userHasLiked ? 'liked' : ''}" onclick="triggerLikePost(${p.id})">
+                    ${p.image ? `<img src="${p.image}" class="post-image-content" alt="">` : ''}
+                    <div class="post-actions">
+                        <button class="btn-like ${userHasLiked ? 'liked' : ''}" onclick="triggerLikePost(${p.id})">
                             ❤️ ${p.likes ? p.likes.length : 0} Like(s)
                         </button>
                     </div>
-                    <div class="post-comments-container">
-                        <div class="post-comments-list">
-                            ${p.comments?.map(c => `<p class="comment-row"><strong>${c.author} :</strong> ${cleanHTML(c.text)}</p>`).join('') || '<em class="empty-comments">Aucun commentaire pour le moment.</em>'}
+                    <div class="comments-section">
+                        <div class="comment-list">
+                            ${p.comments?.map(c => `<p><strong>${c.author} :</strong> ${cleanHTML(c.text)}</p>`).join('') || '<em style="color:#8e8e8e; font-size:12px;">Aucun commentaire pour le moment.</em>'}
                         </div>
-                        <div class="post-comment-form">
-                            <input type="text" class="comment-field" id="input-comment-${p.id}" placeholder="Ajouter un commentaire...">
-                            <button class="btn-submit-comment" onclick="triggerAddComment(${p.id})">Publier</button>
+                        <div class="comment-form">
+                            <input type="text" class="comment-input" id="input-comment-${p.id}" placeholder="Ajouter un commentaire...">
+                            <button class="btn-comment" onclick="triggerAddComment(${p.id})">Publier</button>
                         </div>
                     </div>
                 </div>`;
             }).join('');
         }
 
-        // Ecouteurs d'événements pour la recherche en temps réel
-        // Note : les inputs en HTML appellent filterPosts() via oninput,
-        // on expose donc filterPosts globalement en plus des event listeners
+        // Ecouteurs pour la recherche en temps réel
+        // + alias global window.filterPosts pour les attributs oninput du HTML (feed.html)
         document.getElementById('search-text')?.addEventListener('input', updateFeedDisplay);
         document.getElementById('search-author')?.addEventListener('input', updateFeedDisplay);
-
-        // Alias global pour la compatibilité avec les attributs oninput du HTML (feed.html)
         window.filterPosts = updateFeedDisplay;
 
         window.triggerLikePost = function(id) {
@@ -573,7 +574,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const users = getAllUsers();
 
             if (convs.length === 0) {
-                convList.innerHTML = `<p style="padding: 15px; font-size: 13px; color: #8e8e8e;">Aucune conversation.</p>`;
+                convList.innerHTML = `<p style="padding:15px; font-size:13px; color:#8e8e8e;">Aucune conversation.</p>`;
                 return;
             }
 
@@ -583,14 +584,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 const otherName = otherUser ? `${otherUser.prenom} ${otherUser.nom}` : otherEmail;
                 const otherPhoto = otherUser?.photo || getDefaultAvatar(otherUser?.nom || '?', otherUser?.prenom || '?');
                 const lastMsg = c.messages[c.messages.length - 1];
-                const isActive = c.id === activeConvId ? 'conv-item-active' : '';
+                // Classe active CSS : .conv-item.active (avec bordure bleue à gauche)
+                const isActive = c.id === activeConvId ? 'active' : '';
 
                 return `
                     <div class="conv-item ${isActive}" onclick="openConversation('${c.id}')">
                         <img src="${otherPhoto}" class="conv-avatar" alt="">
                         <div class="conv-info">
                             <span class="conv-name">${otherName}</span>
-                            <span class="conv-last-msg">${lastMsg ? cleanHTML(lastMsg.text).substring(0, 30) + (lastMsg.text.length > 30 ? '…' : '') : 'Nouvelle conversation'}</span>
+                            <span class="conv-preview">${lastMsg ? cleanHTML(lastMsg.text).substring(0, 30) + (lastMsg.text.length > 30 ? '…' : '') : 'Nouvelle conversation'}</span>
                         </div>
                     </div>`;
             }).join('');
@@ -610,31 +612,31 @@ document.addEventListener('DOMContentLoaded', () => {
             const otherPhoto = otherUser?.photo || getDefaultAvatar(otherUser?.nom || '?', otherUser?.prenom || '?');
 
             chatZone.innerHTML = `
-                <div class="chat-header">
+                <div class="chat-header" style="display:flex; align-items:center; gap:12px;">
                     <img src="${otherPhoto}" class="conv-avatar" alt="">
-                    <span style="font-weight: 600; font-size: 15px;">${otherName}</span>
+                    <span>${otherName}</span>
                 </div>
-                <div class="chat-messages" id="chat-messages">
+                <div class="messages-list" id="chat-messages">
                     ${conv.messages.map(m => {
+                        // Classes CSS : .msg-bubble-wrap avec .mine ou .theirs, bulle : .bubble
                         const isMine = m.from === currentUser.email;
                         return `
-                            <div class="msg-bubble-wrap ${isMine ? 'msg-mine' : 'msg-theirs'}">
-                                <div class="msg-bubble">${cleanHTML(m.text)}</div>
-                                <span class="msg-time">${formatDate(m.ts)}</span>
+                            <div class="msg-bubble-wrap ${isMine ? 'mine' : 'theirs'}">
+                                <div class="bubble">${cleanHTML(m.text)}</div>
                             </div>`;
                     }).join('')}
                 </div>
                 <div class="chat-input-bar">
-                    <input type="text" id="msg-input-field" placeholder="Envoyer un message..." style="flex:1; padding:10px; border:1px solid #dbdbdb; border-radius:20px; outline:none;">
-                    <button onclick="sendMessage('${convId}')" class="btn-comment" style="border-radius:20px; padding: 8px 16px;">Envoyer</button>
+                    <input type="text" id="msg-input" placeholder="Envoyer un message...">
+                    <button onclick="sendMessage('${convId}')" class="btn-comment">Envoyer</button>
                 </div>`;
 
             // Scroll automatique vers le bas
             const msgContainer = document.getElementById('chat-messages');
             if (msgContainer) msgContainer.scrollTop = msgContainer.scrollHeight;
 
-            // Envoi via touche Entrée
-            const input = document.getElementById('msg-input-field');
+            // Envoi via touche Entrée — l'input s'appelle #msg-input dans le CSS
+            const input = document.getElementById('msg-input');
             if (input) {
                 input.addEventListener('keydown', (e) => {
                     if (e.key === 'Enter') sendMessage(convId);
@@ -649,7 +651,7 @@ document.addEventListener('DOMContentLoaded', () => {
         };
 
         window.sendMessage = function(convId) {
-            const input = document.getElementById('msg-input-field');
+            const input = document.getElementById('msg-input');
             const text = input ? input.value.trim() : '';
             if (!text) return;
 
@@ -681,19 +683,21 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
+            // Classes CSS : .new-conv-user-item pour les lignes de résultat
             newConvUserlist.innerHTML = users.map(u => `
-                <div class="conv-item" onclick="startConversationWith('${u.email}')" style="cursor:pointer;">
-                    <img src="${u.photo || getDefaultAvatar(u.nom, u.prenom)}" class="conv-avatar" alt="">
+                <div class="new-conv-user-item" onclick="startConversationWith('${u.email}')">
+                    <img src="${u.photo || getDefaultAvatar(u.nom, u.prenom)}" alt="">
                     <div class="conv-info">
                         <span class="conv-name">${u.prenom} ${u.nom}</span>
-                        <span class="conv-last-msg">${u.email}</span>
+                        <span class="conv-preview">${u.email}</span>
                     </div>
                 </div>`).join('');
         }
 
         if (btnNewConv && newConvModal) {
             btnNewConv.onclick = () => {
-                newConvModal.style.display = 'flex';
+                // La modale CSS s'ouvre via display:block (pas flex) — class .open non utilisée
+                newConvModal.style.display = 'block';
                 if (userSearchInput) {
                     userSearchInput.value = '';
                     renderUserSearchResults('');
